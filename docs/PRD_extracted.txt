@@ -1,0 +1,342 @@
+[Title] SYNCSTORE
+Product Description + Product Requirements Document — v3
+Hackaholics 7.0 - Digital Transformation - Working Product Definition - Broad Trade Credit Edition
+"Turn informal trade into trusted, usable financial data."
+Core Product Thesis: SyncStore is a shared trade-credit operating layer for independent wholesalers/distributors and the small businesses they supply. It automatically reconciles payments, maintains a shared transaction record, handles partial payments and disputes, and turns repeated trade activity into useful behavioural signals for credit decisions.
+[Heading1] Build-Lock Decisions (New in v3)
+Four open questions from v1 are resolved here so the team can start building without stalling on strategy mid-build. Each is a provisional call the team should be able to defend, not a claim of certainty - swap any of these if real interviews this week point elsewhere.
+1. Target market: Independent wholesalers/distributors across fragmented, credit-based trade - including FMCG, building materials, pharmaceuticals, agricultural inputs, electronics, spare parts, hospitality supplies, and other B2B wholesale categories - supplying small retailers, contractors, or business customers. This is deliberately horizontal: SyncStore is infrastructure for the trade-credit relationship, not a vertical-specific operating system. The demo should use whichever sector the team can validate most strongly; the ledger logic does not change.
+2. Messaging: Simulated/mocked WhatsApp payloads only, for the entire build - not "simulation as fallback." Real WhatsApp Business API approval realistically takes days the team doesn't have; zero hours should go toward chasing it before the demo.
+3. Trust Score: The six-factor weighted formula in Part II Section 9 is the only scoring mechanism. No model is trained. Machine learning, where used at all, is confined to the anomaly-alert layer (a statistical threshold on velocity change), which is easier to explain under judge questioning than "the model learned it."
+4. Real-time updates: Polling-based dashboard refresh (2-3 second interval) is the P0 requirement. True WebSocket/SSE push is a P2 stretch goal only if the core flow is done early - a judge cannot tell the difference in a two-minute demo, and it removes a whole class of hackathon-week bugs.
+
+[Heading1] Part I - Product Description
+[Heading2] 1. What SyncStore Is
+SyncStore is not a general accounting app, ERP, marketplace, or another payment gateway. It is a focused infrastructure layer for the financial relationship between an independent wholesaler/distributor and the small retailers or contractor customers they repeatedly supply.
+The product sits between an existing commercial relationship and the fragmented records created around it. The distributor keeps their existing customers and supply chain. Retailers do not need to join a new marketplace. SyncStore simply makes the relationship easier to record, reconcile, monitor, and trust.
+[Heading2] 2. The Problem
+[ListParagraph] An independent wholesaler/distributor supplies dozens of small retailers, contractors, or business customers. Each customer can have multiple purchases, partial repayments, outstanding balances, disputes over quantity or quality, and different payment moments - often tied to when their own customers or clients pay them.
+[ListParagraph] The underlying evidence is scattered across bank alerts, receipts, sales representatives, notebooks, spreadsheets, WhatsApp messages, and memory.
+[ListParagraph] The distributor has to reconstruct simple facts manually: what was sold, what was paid, what remains outstanding, and whether a dispute (short delivery, damaged goods, wrong quantity) has been resolved.
+[ListParagraph] The same fragmented history makes it harder to decide, consistently, which contractors and retailers deserve more trade credit heading into a busy season.
+[Heading2] 3. The Insight
+The real opportunity is not "automated reconciliation" by itself. Reconciliation is the entry point. The deeper problem is that informal commercial activity generates valuable financial behaviour every day, but that behaviour is not captured as one trusted, reusable record.
+SyncStore transforms a series of informal interactions into a structured relationship record: sale -> obligation -> payment -> exception -> resolution -> behavioural history.
+[Heading2] 4. The Product Promise
+[ListParagraph] For distributors: know who owes you what, without manually reconstructing the story.
+[ListParagraph] For retailers/contractors: have a clear, shared record of what you owe and what you have already paid.
+[ListParagraph] For financial partners: gain structured behavioural data instead of relying only on fragmented transaction evidence.
+[Heading2] 5. Core User Flow
+[ListParagraph] Create relationship: distributor adds a retailer/contractor and sets a starting credit relationship or trade account.
+[ListParagraph] Record sale: distributor records a sale, invoice, or credit transaction (e.g. 200 cases of drinks, 50 sheets of roofing, or other wholesale inventory). The customer now has an outstanding obligation.
+[ListParagraph] Payment arrives: payment is received through an available payment rail. The system receives the payment event.
+[ListParagraph] Reconcile: SyncStore matches the payment to the appropriate customer/transaction and updates the shared ledger.
+[ListParagraph] Handle exceptions: partial payments, ambiguous payments, disputes (e.g. short delivery), returns, or manual adjustments are recorded explicitly rather than hidden in chat.
+[ListParagraph] Communicate: customer receives a simple balance/receipt/status notification via simulated WhatsApp.
+[ListParagraph] Learn: as transaction history accumulates, SyncStore produces behavioural indicators and risk alerts for the distributor.
+[Heading2] 6. The Shared Ledger
+Every distributor-customer relationship has a continuously updated record, showing the original obligation, all payments, allocation decisions, disputes/adjustments, and current balance in one place. Example: Adeyemi Wholesale, supplying Grace Retail & Trading.
+[TABLE]
+Event | Amount | Status | Evidence
+Purchase / invoice - 200 bags cement | NGN 600,000 | Open | Invoice / sale record
+Payment | NGN 300,000 | Confirmed | Payment reference + timestamp
+Remaining | NGN 300,000 | Outstanding | Derived from ledger
+Dispute - 12 bags short on delivery | NGN 36,000 | Under review | Delivery note / manual evidence
+[/TABLE]
+[Heading2] 7. Zero-UI Retailer Experience
+The customer experience is intentionally lightweight - no new app to learn. A retailer or contractor should be able to receive a balance, receipt, or reminder through a familiar channel. For the hackathon build this is a simulated WhatsApp thread with realistic message payloads; the architecture leaves room for a real provider later.
+Example message: "Payment received: NGN 300,000. Current outstanding balance: NGN 300,000. View statement."
+[Heading2] 8. Handling Messy Commerce
+[ListParagraph] Partial payments: a NGN 300,000 payment against a NGN 600,000 obligation is recorded as partial, not rejected as an error.
+[ListParagraph] Multiple-invoice payments: a payment can be held for allocation instead of being incorrectly attached to one invoice.
+[ListParagraph] Disputes: users can surface the payment reference, amount, timestamp, and transaction context for review - e.g. a short-delivery claim on a wholesale order.
+[ListParagraph] Manual adjustments: authorized distributors can record cash collections, returns, credits, or corrections with an audit trail.
+[ListParagraph] Unmatched payments: funds that cannot be confidently assigned are flagged for human review rather than silently misallocated.
+[Heading2] 9. Behavioural Intelligence
+Once a distributor has sufficient history, SyncStore computes behavioural signals: repayment consistency, average days outstanding, payment-frequency changes, transaction volume, dispute frequency, and recent payment-velocity changes. These are decision-support signals, not automatic loan approvals.
+[Heading2] 10. Trust / Credit Score
+The Trust Score is a transparent, weighted behavioural index (see Part II Section 9) - never an opaque "AI credit score." The score always exposes the underlying factors so a distributor can see why it changed.
+[ListParagraph] Repayment consistency
+[ListParagraph] Average repayment duration
+[ListParagraph] Late-payment frequency
+[ListParagraph] Outstanding exposure
+[ListParagraph] Payment-velocity trend
+[ListParagraph] Dispute frequency and resolution behaviour
+[Heading2] 11. Predictive Risk / Anomaly Detection
+The intelligence layer focuses on detecting meaningful changes, not adding a chatbot. Example: a contractor whose normal weekly payment behaviour drops sharply while outstanding exposure increases triggers an alert such as:
+"Behavioural change detected: payment velocity down 40% over the last 7 days. Review current credit exposure."
+This uses a simple statistical threshold on the velocity trend - not a trained model - so every alert can be explained in one sentence if a judge asks how it was produced.
+[Heading2] 12. Why This Is Different
+SyncStore explicitly avoids becoming a closed-loop marketplace or a replacement for a distributor's existing commercial relationship. The distributor keeps their customers, products, suppliers, pricing, and ordinary way of doing business. SyncStore adds a neutral record and intelligence layer on top of that relationship - and it deliberately sits as a neutral trade-credit layer rather than as a closed-loop marketplace or distributor replacement.
+[ListParagraph] No mandatory marketplace switch.
+[ListParagraph] No need for the distributor to replace their whole ERP for the MVP.
+[ListParagraph] Customers keep familiar payment and communication behaviour.
+[ListParagraph] The product is centered on the bilateral trade-credit relationship, not on owning the entire supply chain.
+[ListParagraph] The key asset is the shared, auditable history and the intelligence derived from it.
+[Heading2] 13. Wema Bank Role
+Wema is positioned as infrastructure and a potential financial-services partner, not as the reason the product exists. The customer problem exists independently. Wema can add payment rails, account infrastructure, and potentially future financial products once the behavioural record is strong enough.
+Implementation note: exact Wema API products, sandbox access, limits, and partner requirements must be confirmed before promising a specific integration in a pitch or demo.
+[Heading2] 14. Product Vision
+Make informal commercial relationships measurable, verifiable, and financially useful without forcing the participants to abandon how they already do business.
+
+[Heading1] Part II - Product Requirements Document (PRD)
+[Heading2] 1. Product Overview
+[TABLE]
+Field | Value
+Product | SyncStore
+Track | Hackaholics 7.0 - Digital Transformation
+Target market | Independent wholesalers/distributors and their retailer, contractor, or business customers
+MVP focus | Shared trade-credit ledger + payment reconciliation + exception handling + behavioural intelligence
+Primary demo | Distributor creates a credit transaction -> payment arrives -> balance updates -> partial payment/dispute handled -> risk alert appears
+Platform | Responsive web dashboard for distributor + simulated WhatsApp thread for the customer
+[/TABLE]
+[Heading2] 2. Product Goals
+[ListParagraph] Give a distributor one authoritative view of customer obligations and payments.
+[ListParagraph] Automatically reconcile incoming payments when confidence is high.
+[ListParagraph] Handle partial, ambiguous, and disputed payments without corrupting the ledger.
+[ListParagraph] Provide a lightweight customer experience with minimal onboarding friction.
+[ListParagraph] Create a trustworthy historical record from repeated trade activity.
+[ListParagraph] Generate interpretable behavioural signals and anomaly alerts.
+[ListParagraph] Demonstrate a clear Wema partnership path without making Wema a forced dependency.
+[ListParagraph] Deliver a reliable hackathon MVP that never depends on a live bank or messaging API succeeding on stage.
+[Heading2] 3. Non-Goals for the MVP
+[ListParagraph] Full ERP replacement.
+[ListParagraph] Full inventory management.
+[ListParagraph] Marketplace or procurement network.
+[ListParagraph] Consumer banking app.
+[ListParagraph] Automatic lending or loan approval.
+[ListParagraph] Regulated credit-bureau claims.
+[ListParagraph] Complex multi-country compliance.
+[ListParagraph] Real WhatsApp Business API integration (simulated for the entire build - see Build-Lock Decisions).
+[ListParagraph] Trained ML model for the Trust Score (weighted formula only - see Build-Lock Decisions).
+[Heading2] 4. Personas
+Distributor (e.g. Adeyemi Wholesale): owns customer relationships, supplies products across a wholesale category, extends trade credit, receives payments, and needs visibility into balances and risk.
+Retailer / Business Customer (e.g. Grace Retail & Trading): buys goods repeatedly for resale, project use, or business operations, may pay in installments, and wants a simple way to know outstanding balance and confirm payments.
+Sales / Collections Staff: may create transactions, record manual collections, resolve exceptions, and communicate with customers.
+Financial Partner (future): consumes authorized behavioural signals or verified records to inform financial products. Not an MVP operator role.
+[Heading2] 5. Core User Stories
+[ListParagraph] As a distributor, I can create a customer profile so that I can track our commercial relationship.
+[ListParagraph] As a distributor, I can record a sale/credit transaction and specify the amount due.
+[ListParagraph] As a customer, I can receive a clear confirmation of what I owe without learning a complex application.
+[ListParagraph] As a system, I can receive a payment event and attempt to match it to the correct customer/obligation.
+[ListParagraph] As a distributor, I can see the exact balance after every confirmed payment.
+[ListParagraph] As a distributor, I can record or resolve a partial payment without losing the original obligation.
+[ListParagraph] As a distributor, I can review unmatched payments and manually assign them with an audit trail.
+[ListParagraph] As a distributor, I can see a customer's payment history and behavioural signals.
+[ListParagraph] As a distributor, I can receive an alert when a meaningful deterioration in payment behaviour is detected.
+[ListParagraph] As an authorized user, I can export or view a transaction statement for a customer.
+[Heading2] 6. Functional Requirements
+[Heading2] A. Authentication & Roles
+[TABLE]
+ID | Requirement
+FR-A1 | Users can sign in to the distributor dashboard.
+FR-A2 | Roles supported at minimum: Admin, Operator/Collections.
+FR-A3 | Sensitive actions such as manual ledger adjustments are permission-controlled.
+[/TABLE]
+[Heading2] B. Retailer/Contractor Management
+[TABLE]
+ID | Requirement
+FR-B1 | Create/edit/deactivate customer profile.
+FR-B2 | Store contact details and optional external/customer reference.
+FR-B3 | View relationship summary: current balance, credit limit, recent activity, behavioural signals.
+[/TABLE]
+[Heading2] C. Transaction Management
+[TABLE]
+ID | Requirement
+FR-C1 | Create a sale/credit obligation.
+FR-C2 | Associate one or more line items or a total amount.
+FR-C3 | View transaction status: Open, Partially Paid, Settled, Disputed, Cancelled.
+FR-C4 | Maintain immutable event history for material ledger events.
+[/TABLE]
+[Heading2] D. Payment & Reconciliation
+[TABLE]
+ID | Requirement
+FR-D1 | Receive payment events through a payment adapter/webhook layer (simulated for MVP).
+FR-D2 | Attempt automated matching using customer/payment identity and transaction context.
+FR-D3 | Support partial payments.
+FR-D4 | Flag low-confidence or ambiguous payments for review.
+FR-D5 | Update balances via polling refresh, 2-3 second interval (P0). True push updates are P2.
+FR-D6 | Prevent double-posting of the same payment event using idempotency controls.
+[/TABLE]
+[Heading2] E. Exceptions & Disputes
+[TABLE]
+ID | Requirement
+FR-E1 | Open an exception/dispute against a transaction or payment.
+FR-E2 | Attach notes and evidence references.
+FR-E3 | Resolve an exception using explicit statuses and audit history.
+FR-E4 | Never silently overwrite the historical ledger.
+[/TABLE]
+[Heading2] F. Customer Communication
+[TABLE]
+ID | Requirement
+FR-F1 | Send payment confirmations (simulated WhatsApp payload).
+FR-F2 | Send current-balance summaries (simulated WhatsApp payload).
+FR-F3 | Support simple simulated inbound queries such as balance/statement lookup.
+FR-F4 | All messaging is simulated/mocked for the hackathon build - no live provider dependency, by design.
+[/TABLE]
+[Heading2] G. Behavioural Intelligence
+[TABLE]
+ID | Requirement
+FR-G1 | Calculate transparent behavioural metrics using the Section 9 weighted formula.
+FR-G2 | Generate a Trust Score only when minimum history thresholds are met (default: 5 transactions or 30 days, whichever first).
+FR-G3 | Show the main factors contributing to the score.
+FR-G4 | Detect significant changes in payment behaviour via a statistical velocity threshold.
+FR-G5 | Display alerts with context, not deterministic claims of default.
+[/TABLE]
+[Heading2] H. Reporting
+[TABLE]
+ID | Requirement
+FR-H1 | Distributor can view total outstanding exposure.
+FR-H2 | Distributor can view top overdue/high-risk relationships.
+FR-H3 | Distributor can view recent payment activity.
+FR-H4 | Distributor can produce a customer statement.
+[/TABLE]
+[Heading2] 7. Core Data Model
+[ListParagraph] Distributor: organization, users, business metadata.
+[ListParagraph] Retailer/Contractor: customer identity, contact channels, account status, credit relationship.
+[ListParagraph] CreditAccount: credit limit, current exposure, relationship state.
+[ListParagraph] Transaction: sale/credit event, amount, date, terms, source reference.
+[ListParagraph] Payment: amount, timestamp, payment reference, channel/source, match status.
+[ListParagraph] Allocation: mapping between payment and one or more obligations.
+[ListParagraph] Exception: type, status, reason, notes, evidence references, resolution.
+[ListParagraph] BehaviourSnapshot: calculated metrics used for score/alerts.
+[ListParagraph] MessageEvent: outbound/inbound simulated WhatsApp event.
+[ListParagraph] AuditEvent: actor, timestamp, action, before/after context where appropriate.
+[Heading2] 8. Business Rules
+[ListParagraph] No payment may be counted twice; payment events require an idempotency key or equivalent deduplication mechanism.
+[ListParagraph] A partial payment reduces outstanding exposure but does not close the obligation unless the resulting balance reaches zero or an authorized adjustment settles it.
+[ListParagraph] An unmatched payment is never auto-assigned when confidence is below a configured threshold.
+[ListParagraph] Manual adjustments must be attributable to a specific user and timestamped.
+[ListParagraph] Historical ledger events are append-only from the application's logical perspective; corrections create new events rather than rewriting history.
+[ListParagraph] Trust Score calculations require the minimum-history threshold in FR-G2 so a new customer is not given a false-precision score.
+[ListParagraph] Risk alerts are recommendations for review, not automatic credit decisions.
+[Heading2] 9. Trust Score v1 (canonical scoring mechanism)
+[TABLE]
+Factor | Weight | Description
+Repayment consistency | 30% | Illustrative weighting for MVP; validate before production use.
+Timeliness / days outstanding | 20% | Illustrative weighting for MVP; validate before production use.
+Payment-velocity stability | 15% | Illustrative weighting for MVP; validate before production use.
+Outstanding exposure trend | 15% | Illustrative weighting for MVP; validate before production use.
+Dispute frequency/resolution | 10% | Illustrative weighting for MVP; validate before production use.
+Relationship tenure / consistency | 10% | Illustrative weighting for MVP; validate before production use.
+[/TABLE]
+[Heading2] 10. AI / ML Specification
+No model is trained for v2 of the MVP. The Trust Score is entirely the deterministic, weighted formula in Section 9 - fully explainable, no "the model learned it" exposure under judge questioning.
+[ListParagraph] Scoring: weighted-factor formula (Section 9), computed directly from ledger data.
+[ListParagraph] Anomaly detection: a statistical threshold on payment-velocity trend (e.g. current vs. trailing average), not a trained classifier.
+[ListParagraph] Outputs: behavioural score, anomaly flags, plain-language reasons for both.
+[ListParagraph] Required UI: show the top factors behind each alert/score change.
+[ListParagraph] Demo data: synthetic but internally consistent, with clearly documented assumptions.
+[ListParagraph] Safety: never claim the score guarantees default or loan repayment.
+[ListParagraph] Optional stretch (P2 only, time-permitting): a lightweight local model (e.g. Gemma 4 e2b) for classifying free-text dispute notes or simulated inbound WhatsApp queries - kept out of the scoring path entirely.
+[Heading2] 11. Messaging Requirements (Simulated)
+[ListParagraph] Outbound payment confirmation template.
+[ListParagraph] Outstanding balance template.
+[ListParagraph] Statement request response.
+[ListParagraph] Partial-payment confirmation.
+[ListParagraph] Dispute acknowledgement.
+[ListParagraph] All of the above render as realistic mocked WhatsApp payloads in the demo UI - no live provider is used or attempted.
+[Heading2] 12. Payment Integration Architecture
+Use a provider-agnostic payment adapter so application logic does not depend directly on one bank API. The adapter exposes a normalized event shape - PaymentReceived, PaymentPending, PaymentReversed, PaymentFailed. For the hackathon, the adapter's only implementation is a deterministic simulator; a Wema-specific implementation can plug in later once exact API access is confirmed.
+[Heading2] 13. Technical Architecture
+[TABLE]
+Layer | Recommended approach
+Frontend | React / Next.js responsive web dashboard; mobile-first distributor workflows.
+Backend | Node.js/TypeScript or Python service layer exposing REST APIs.
+Database | PostgreSQL for transactional ledger state.
+Live updates | Polling refresh (2-3s) for P0. WebSockets/SSE only as a P2 stretch.
+Messaging | Simulated WhatsApp payload generator behind the same service interface a real provider would use.
+AI/ML | In-process weighted-formula scoring + statistical anomaly threshold; no trained model in the critical path.
+Storage | Object storage for optional evidence attachments.
+Auth | Session/JWT-based auth for MVP with role checks.
+Observability | Structured logs + request IDs + audit events.
+Demo layer | Simulation engine capable of replaying payment/dispute events deterministically.
+[/TABLE]
+[Heading2] 14. Hackathon Demo Mode
+The demo never depends on a live banking or messaging provider succeeding on stage - both are simulated by design, not as a fallback.
+[ListParagraph] Start simulation with a distributor and three customers.
+[ListParagraph] Replay three payments through the same code path used by (future) webhook events.
+[ListParagraph] Update the shared balances live via polling.
+[ListParagraph] Trigger one partial payment.
+[ListParagraph] Trigger one anomaly/risk alert.
+[ListParagraph] Show simulated WhatsApp messages with realistic payloads.
+[ListParagraph] Keep a recorded backup walkthrough available in case anything fails on stage.
+[Heading2] 15. Key Screens
+[ListParagraph] Distributor Home: outstanding exposure, collections today, recent alerts.
+[ListParagraph] Customer List: current balance, credit limit, Trust Score, last payment, alert state.
+[ListParagraph] Customer Detail: transaction timeline, payment history, outstanding balance, behavioural metrics.
+[ListParagraph] Create Transaction: customer, amount, terms, optional invoice reference.
+[ListParagraph] Payment Review: matched/unmatched/partial payment queue.
+[ListParagraph] Exception Detail: evidence, notes, resolution workflow.
+[ListParagraph] Risk Center: behavioural alerts and explainable factors.
+[ListParagraph] Demo Mode: deterministic simulation controls.
+[Heading2] 16. Success Metrics for the MVP
+[TABLE]
+Metric | MVP target
+Reconciliation accuracy | at least 99% for high-confidence synthetic/demo events
+Duplicate payment handling | 0 duplicate ledger postings in test suite
+Balance update latency | 3 seconds or less from simulated payment event to dashboard update
+Partial payment correctness | 100% of test cases preserve outstanding balance accurately
+Alert explainability | Every alert displays at least 2 contributing factors
+Demo reliability | Full scripted demo succeeds repeatedly with zero external dependency
+[/TABLE]
+[Heading2] 17. Risks and Mitigations
+[TABLE]
+Risk | Mitigation
+Existing competitors (OmniRetail, Duplo, FieldAssist) | The product is intentionally horizontal and neutral: it does not compete by owning a marketplace or replacing a distributor's supply chain. Vertical selection should be based on the team's strongest validated customer segment and should be pressure-tested before the final pitch.
+Low customer adoption | Zero-UI/simulated messaging; distributor-side value is immediate even before any customer engages.
+Bad payment matching | Confidence thresholds, idempotency, explicit unmatched queue, human review.
+Weak AI claims | Formula-based score, statistical anomaly threshold, factors always shown - no unexplainable model.
+Wema API availability | Provider adapter + deterministic simulation - build never depends on it.
+Feature creep | MVP protected around ledger, reconciliation, exceptions, and one intelligence layer - see Section 19.
+Data quality | Provenance visible; audit events preserved.
+Regulated lending claims | Trust Score is never presented as a credit-bureau or automatic lending decision.
+[/TABLE]
+[Heading2] 18. Competitive Positioning Principle
+SyncStore should never claim: "We are the first to digitize FMCG distribution."
+SyncStore should claim: "We give independent wholesalers and distributors a neutral, shared record of the financial relationship they already have with their customers - without forcing them into a new marketplace or replacing the systems and relationships they already use."
+This positioning should still be pressure-tested against real distributors before the final pitch - the horizontal model gives flexibility, but the initial customer segment must still be validated.
+[Heading2] 19. MVP Priorities
+[ListParagraph] P0 - Distributor authentication and customer management.
+[ListParagraph] P0 - Credit transaction creation and shared ledger.
+[ListParagraph] P0 - Payment event ingestion and deterministic reconciliation.
+[ListParagraph] P0 - Partial payment + unmatched payment handling.
+[ListParagraph] P0 - Simulated WhatsApp messaging flow.
+[ListParagraph] P0 - Polling-based dashboard update.
+[ListParagraph] P1 - Behavioural metrics + explainable Trust Score (Section 9 formula).
+[ListParagraph] P1 - Anomaly alert when payment behaviour changes.
+[ListParagraph] P1 - Demo simulation mode.
+[ListParagraph] P2 - WebSocket/SSE push updates, external exports, additional payment rails, local-model dispute-note classification.
+[Heading2] 20. Build Sequence
+[ListParagraph] Phase 1: Define ledger schema, roles, and core transaction state machine.
+[ListParagraph] Phase 2: Build distributor dashboard and customer creation flow.
+[ListParagraph] Phase 3: Implement payment adapter, reconciliation rules, idempotency, and partial payment logic.
+[ListParagraph] Phase 4: Add simulated WhatsApp templates and polling-based UI updates.
+[ListParagraph] Phase 5: Add behavioural features and the Section 9 weighted Trust Score.
+[ListParagraph] Phase 6: Add anomaly alert and explanation layer.
+[ListParagraph] Phase 7: Build deterministic demo simulation and rehearse the full pitch.
+[ListParagraph] Phase 8: Harden edge cases and remove any nonessential features.
+[Heading2] 21. Acceptance Criteria for the Hackathon Demo
+[ListParagraph] A distributor can create a customer and assign a credit obligation in under 20 seconds.
+[ListParagraph] A simulated payment updates the correct customer's balance without a page refresh (via polling).
+[ListParagraph] A partial payment leaves the correct outstanding balance.
+[ListParagraph] An unmatched payment appears in a review queue rather than being silently assigned.
+[ListParagraph] A customer-facing confirmation is produced within the scripted demo flow.
+[ListParagraph] A behavioural change causes a visible alert with an explanation.
+[ListParagraph] The full demo can be repeated from a clean state without data corruption.
+[ListParagraph] The team can explain exactly what is real, simulated, synthetic, and future-state.
+[Heading2] 22. Still Open (genuinely unresolved, not blocking Phase 1)
+[ListParagraph] What exact Wema API products/sandbox credentials are available to the team, if any.
+[ListParagraph] What minimum transaction history should be required before showing a Trust Score - default in FR-G2 is a starting point, not final.
+[ListParagraph] What evidence will make the score useful enough for distributors to act on, beyond the demo.
+[ListParagraph] Whether real interviews confirm any one trade category as the strongest initial pilot, or point to a better-validated customer segment.
+[Heading2] 23. Pitch Narrative
+Problem: Independent wholesalers/distributors sell on trust, but the financial relationship lives across bank alerts, WhatsApp, notebooks, and memory.
+Insight: The most valuable missing asset is not another payment app; it is a trusted shared record of the relationship.
+Solution: SyncStore reconciles payments automatically, keeps both sides on the same balance, and captures the behavioural history created by repeated trade.
+Transformation: Fragmented payments and informal memory become a live ledger and actionable intelligence.
+Why now: Digital payment rails exist, but the operational relationship around trade credit remains fragmented across sectors - and many existing platforms either own the transaction marketplace or require businesses to replace substantial parts of their current workflow.
+Wema role: Wema can provide infrastructure and, with appropriate approvals, become a financial-services partner on top of the resulting data layer.
+Vision: Make informal trade financially visible without forcing businesses to abandon the relationships and workflows that already work for them.
+[Heading2] 24. Source & Assumption Note
+This document incorporates the product direction and risks identified through the team's Claude review and subsequent discussion, including a v3 revision that broadened the target market while locking the messaging approach, scoring mechanism, and real-time strategy to remove ambiguity before Phase 1 begins. Claims about competitor capabilities, Wema products/APIs, or market size should still be independently verified before appearing as factual claims in an external pitch. The product requirements themselves are the team's working design, not claims that these capabilities already exist.
