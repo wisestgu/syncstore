@@ -1,0 +1,209 @@
+We have completed the SyncStore project foundation/architecture phase.
+
+We are now splitting development across two Claude Code instances.
+
+YOU OWN THE FRONTEND / UX / DEMO EXPERIENCE.
+
+Another developer is simultaneously building the backend, database, ledger, payment engine, disputes, Trust Score and APIs.
+
+IMPORTANT:
+- Do NOT redesign the backend architecture.
+- Do NOT change Prisma/database models unless absolutely necessary.
+- Do NOT implement business logic that belongs in the backend.
+- Consume the API contract created by the backend developer.
+- Do NOT create fake hardcoded financial data when an API/data source exists.
+- Read /docs/PRD.md and /CLAUDE.md before starting.
+- Read /docs/API_CONTRACT.md once the backend contract exists.
+
+YOUR RESPONSIBILITIES:
+
+1. APPLICATION SHELL
+Build:
+- responsive layout
+- navigation
+- sidebar
+- header
+- user menu
+- loading/error states
+
+2. AUTH UI
+Build:
+- login screen
+- validation
+- protected routes
+- role-aware navigation where needed
+
+3. DISTRIBUTOR DASHBOARD
+Create a polished B2B financial dashboard showing:
+
+- total outstanding exposure
+- collections today
+- number of active customers
+- customers needing attention
+- recent payment activity
+- behavioural alerts
+- Trust Score summaries
+
+The dashboard must feel like a real operational system, not a generic admin template.
+
+4. CUSTOMER MANAGEMENT
+Build:
+- customer list
+- search
+- filtering
+- customer creation
+- customer detail
+
+Customer detail should show:
+- current balance
+- credit limit
+- Trust Score
+- score breakdown
+- transaction timeline
+- payment history
+- disputes
+- behavioural metrics
+
+5. TRANSACTION UI
+Build:
+- create credit transaction
+- transaction list
+- transaction detail
+- status badges
+- outstanding balance
+- payment history
+
+6. PAYMENT REVIEW
+Build a strong payment operations screen.
+
+Show:
+- matched payments
+- unmatched payments
+- partial payments
+- payment references
+- timestamps
+- allocation status
+
+Allow authorized users to:
+- review
+- allocate
+- resolve
+
+7. DISPUTES
+Build:
+- exceptions list
+- filtering
+- detail view
+- evidence
+- notes
+- resolution actions
+- audit timeline
+
+Make disputes visually obvious but professional.
+
+8. RISK CENTER
+Build:
+- behavioural alerts
+- Trust Score distribution
+- customer risk list
+- anomaly details
+
+Every score/alert must expose WHY it exists.
+
+Example:
+"Payment velocity down 40%"
+"Outstanding exposure increased 22%"
+"Late payments increased from 1 to 3"
+
+Do not present Trust Score as an automatic loan decision.
+
+9. SIMULATED WHATSAPP
+Build a convincing WhatsApp-style conversation interface.
+
+Messages must come from actual backend message events.
+
+Support:
+- payment received
+- balance
+- statement
+- partial payment
+- dispute acknowledgement
+
+The WhatsApp experience should feel lightweight and realistic.
+
+10. DEMO MODE
+Create the best screen in the application.
+
+The demo should allow:
+
+START DEMO
+RESET
+NEXT EVENT
+AUTO PLAY
+
+The demo sequence:
+
+1. distributor starts with messy-looking customer state
+2. new credit transaction appears
+3. payment event arrives
+4. balance updates
+5. WhatsApp message appears
+6. partial payment occurs
+7. dispute appears
+8. payment behaviour deteriorates
+9. anomaly alert appears
+10. Trust Score updates
+
+IMPORTANT:
+These controls must trigger REAL backend actions.
+
+Do not create a separate fake demo backend.
+
+11. UX PRIORITY
+Focus on:
+- clean typography
+- strong hierarchy
+- excellent spacing
+- polished tables
+- intuitive status colours
+- subtle animations
+- mobile responsiveness
+- extremely clear numbers
+
+Avoid:
+- excessive gradients
+- unnecessary cards
+- excessive charts
+- generic SaaS template styling
+- fake AI gimmicks
+
+12. API INTEGRATION
+Use the backend developer's API contract.
+
+Create a typed client/data-access layer so components do not call APIs directly everywhere.
+
+Handle:
+- loading
+- empty
+- error
+- success
+- optimistic states where safe
+
+13. FINAL VALIDATION
+Before finishing:
+- run lint
+- run TypeScript
+- run production build
+- test every major screen
+- verify mobile responsiveness
+- verify demo mode from clean state
+
+Do not modify backend business logic.
+
+When finished, report:
+1. screens completed
+2. API endpoints consumed
+3. components created
+4. demo sequence
+5. remaining frontend issues
+6. commands used to validate
