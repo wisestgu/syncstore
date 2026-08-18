@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/*
+ * Deliberate single light theme: this is an operational finance tool and the
+ * demo must look identical on every machine. Numbers are always tabular.
+ */
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus visibility for keyboard users, consistent everywhere */
+:focus-visible {
+  outline: 2px solid theme(--color-sky-600);
+  outline-offset: 1px;
+}
+
+/* Subtle entrance for polled-in rows (demo readability) */
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.row-in {
+  animation: row-in 220ms ease-out;
+}
+
+/* WhatsApp pane background texture */
+.wa-bg {
+  background-color: #e5ddd5;
+  background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.04) 1px, transparent 0);
+  background-size: 18px 18px;
+}
